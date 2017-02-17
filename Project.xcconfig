@@ -17,4 +17,4 @@ OTHER_LDFLAGS = $(OF_CORE_LIBS) // -L/usr/local/lib -lavcodec -lavformat
 HEADER_SEARCH_PATHS = $(OF_CORE_HEADERS)
 
 
-FFMPEGPATH=/Users/Tintamar/Downloads/FFmpeg-master
+FFMPEGPATH=/Users/Tintamar/Dev/FFmpeg-master

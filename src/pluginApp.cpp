@@ -42,12 +42,17 @@ pluginApp::pluginApp(int minInputs, int maxInputs)
   play = false;
   addBoolParameter("Play",&play);
 
+
+  showDebug = true;
+  addBoolParameter("ShowDebug",&showDebug);
+
+  bankParam = 0;
+  addFloatParameter("bank", &bankParam,0,10);
+  
   //  addStringParameter("videoCacheDirectory", &videoCacheDirectory);
 
 
-  ofFile tmpCacheF(ofFilePath::getUserHomeDir()+"/Documents/Entoorlooper/");
-  if(!tmpCacheF.exists())tmpCacheF.create();
-  videoCacheDirectory = tmpCacheF.getAbsolutePath().c_str();
+
   //  SetParamInfo(parameters.size(), "videoCachDir", FF_TYPE_TEXT, &videoCacheDirectory[0]);
 
   initParameters(); // Setup parameters with host
@@ -69,7 +74,7 @@ pluginApp::~pluginApp()
 
   ofLogError("pluginApp") << "deleting " << pIcount--;
 
-  //    vidRecorder->close(true);
+  //    videoRecorder->close(true);
 }
 
 
@@ -108,21 +113,25 @@ void pluginApp::setup()
 }
 
 void pluginApp::initVideoRecorder(){
+  ofFile tmpCacheF(ofFilePath::getUserHomeDir()+"/Documents/Entoorlooper/");
+  if(!tmpCacheF.exists())tmpCacheF.create();
+  videoCacheDirectory = tmpCacheF.getAbsolutePath().c_str();
   folderName = videoCacheDirectory;
-  if(folderName.length() && folderName[folderName.length()-1]!='/')folderName+='/';
+  folderName = ofFilePath::addTrailingSlash(folderName);
+
   fileExt = ".mov"; // ffmpeg uses the extension to determine the container type. run 'ffmpeg -formats' to see supported formats
 
   // override the default codecs if you like
   // run 'ffmpeg -codecs' to find out what your implementation supports (or -formats on some older versions)
-  //    vidRecorder->setVideoCodec("hap");
-  //    vidRecorder.setVideoFormat("hap_q");
-  //    vidRecorder.setVideoBitrate("800k");
+  //    videoRecorder->setVideoCodec("hap");
+  //    videoRecorder.setVideoFormat("hap_q");
+  //    videoRecorder.setVideoBitrate("800k");
 
   // 4. Register for events so we'll know when videos finish saving.
-  //  ofAddListener(vidRecorder->videoSavedEvent, this, &ofApp::videoSaved);
+  //  ofAddListener(videoRecorder->videoSavedEvent, this, &ofApp::videoSaved);
 
-  vidRecorder = make_shared<ofxFFMPEGVideoWriter>();
-  //  vidRecorder->initRecording();
+  videoRecorder = make_shared<ofxFFMPEGVideoWriter>();
+  //  videoRecorder->initRecording();
 
 
 
@@ -143,7 +152,7 @@ void pluginApp::setupShaders()
 
 void pluginApp::update()
 {
-  vidRecorder->update(timeNow);
+  videoRecorder->update(timeNow);
 }
 
 // **************************************************************************
@@ -239,7 +248,7 @@ void pluginApp::addFrame(ofTexture * tex){
 #endif
 
 
-  vidRecorder->addFrame(_pix.getData());
+  videoRecorder->addFrame(_pix.getData());
 
 
 }
@@ -248,7 +257,7 @@ void pluginApp::draw()
 {
   // input textures from host are stored here
   ofTexture * tex = inputTextures[0];
-  int b= 255;
+  int b= 0;
   int a = 0;
   glClearColor(b / 255., b / 255., b / 255., a / 255.);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -262,9 +271,9 @@ void pluginApp::draw()
   }
 
   // check time interval
-  if( rec && vidRecorder->isInitialized()){
+  if( rec && videoRecorder->isInitialized()){
 
-    if(vidRecorder->needNewFrame()){
+    if(videoRecorder->needNewFrame()){
       addFrame(tex);
     }
     else{
@@ -272,18 +281,6 @@ void pluginApp::draw()
     }
   }
 
-  else if( videoPlayer.isLoaded()){
-    if(play){
-
-      videoPlayer.update();
-      ofSetColor(255,255,255,255);
-      ofFill();
-      videoPlayer.draw(0,0,ofGetWidth(),ofGetHeight());
-      //          ofLogVerbose("videoPlayer") <<"playPos: "<< videoPlayer.getPosition();
-    }
-
-
-  }
 
   if(!videoPlayer.isLoaded()){
     if(play && lastLoadedFile!=""){
@@ -298,6 +295,22 @@ void pluginApp::draw()
 
   }
 
+  if( videoPlayer.isLoaded()){
+    if(play){
+
+      videoPlayer.update();
+      ofSetColor(255,255,255,255);
+      ofFill();
+      // fuckin vflip somwhere
+      videoPlayer.draw(0,ofGetHeight(),ofGetWidth(),-ofGetHeight());
+      //          ofLogVerbose("videoPlayer") <<"playPos: "<< videoPlayer.getPosition();
+    }
+
+
+  }
+
+
+
   ofSetColor(255,255,255,255);
   if(!play){
     tex->draw(0,0);
@@ -308,8 +321,8 @@ void pluginApp::draw()
   ofFill();
 
   //    stringstream ss;
-  //    ss << "video queue size: " << vidRecorder.getVideoQueueSize() << endl
-  //    << "audio queue size: " << vidRecorder.getAudioQueueSize() << endl
+  //    ss << "video queue size: " << videoRecorder.getVideoQueueSize() << endl
+  //    << "audio queue size: " << videoRecorder.getAudioQueueSize() << endl
   //    << "FPS: " << ofGetFrameRate() << endl
   //    << (rec?"pause":"start") << " recording: r" << endl
   //    << (rec?"close current video file: c":"") << endl;
@@ -318,10 +331,14 @@ void pluginApp::draw()
   //    ofDrawBitmapString(ss.str(),15,15);
   // Draw a simple geometric shape
 
+
+  if(showDebug){
+
   ofSetColor(255,0,0);
   int pad = 20;
   if(rec){
     ofSetColor(255,0,0);
+    if(videoRecorder)
     ofDrawRectangle(pad, pad, 2*pad, 2*pad);
   }
   if(play){
@@ -329,6 +346,7 @@ void pluginApp::draw()
     ofDrawRectangle(3*pad, 3*pad, 4*pad, 4*pad);
   }
 
+  }
 
   ofSetColor( 255, 255, 255 );
 
@@ -336,38 +354,74 @@ void pluginApp::draw()
 
 }
 
+string pluginApp::getCurrentFilePath(){
+  return (folderName+ofToString(currentBank)+fileExt);
+  
+}
 // **************************************************************************
 
 void pluginApp::onParameterChanged(ofPtr<ofFFGLParameter> param)
 {
   // Do something if you wish
   if(((bool*)param->getAddress()) == &rec && rec!=lastRec){
-
+    string fileName =getCurrentFilePath();
     if(rec ) {
-      folderName = ofFilePath::addTrailingSlash(folderName);
-      //            vidRecorder.commonPipeFolder = folderName;
-      //          ofGetTimestampString()
-      string fileName =(folderName+"1"+fileExt);
+
       if(videoPlayer.getMoviePath()==fileName){
         videoPlayer.close();
       }
       lastLoadedFile = fileName;
 
-      vidRecorder->setup(fileName.c_str(), ofGetWidth(), ofGetHeight());
+      videoRecorder->setup(fileName.c_str(), ofGetWidth(), ofGetHeight());
 
-      //            vidRecorder->start();
     }
-    else if(!rec && vidRecorder->isInitialized()) {
-      //            vidRecorder.setPaused(true);
-      vidRecorder->close();
+    else if(!rec && videoRecorder->isInitialized()) {
+      //            videoRecorder.setPaused(true);
+      videoRecorder->close();
+//      videoPlayer.load(fileName);
     }
 
     lastRec = rec;
+  }
+  else   if(((bool*)param->getAddress()) == &play && play!=lastPlay){
+
+    if(play ) {
+
+      //            videoRecorder.commonPipeFolder = folderName;
+      //          ofGetTimestampString()
+      string fileName =getCurrentFilePath();
+      if(videoPlayer.getMoviePath()!=fileName){
+        videoPlayer.close();
+        videoPlayer.load(fileName);
+      }
+      else{
+        videoPlayer.setPosition(0);
+      }
+      videoPlayer.play();
+
+    }
+    else if(!play && videoPlayer.isInitialized()) {
+      videoPlayer.stop();
+    }
+
+    lastPlay = play;
   }
   else if(((float*)param->getAddress()) == &speed ){
     videoPlayer.setSpeed(speed);
 
 
+  }
+  else if(((float*)param->getAddress()) == &bankParam){
+
+    int cB =   floor(bankParam);
+    if(cB!=currentBank){
+
+      currentBank = cB;
+      string curPath = getCurrentFilePath();
+      if(!play &&ofFile(curPath).exists() && videoPlayer.getMoviePath()!=curPath){
+        videoPlayer.load(curPath);
+      }
+    }
   }
   else{
     int dbg;

@@ -57,7 +57,7 @@ public:
 
 //    ofFbo fbo;
   
-		ofPtr<ofxFFMPEGVideoWriter>	vidRecorder;
+		ofPtr<ofxFFMPEGVideoWriter>	videoRecorder;
 
   ofVideoPlayer recordedVideoPlayback;
 
@@ -96,6 +96,13 @@ private: // Insert here declarations needed in your implementation
   vector<ofPixels> pixTab;
   ofBufferObject bufferObj[2];
   int idxBuf;
+
+  float bankParam;
+  string getCurrentFilePath();
+  int currentBank;
+
+  bool showDebug;
+  
 //  BufferList ofBuf;
 };
 

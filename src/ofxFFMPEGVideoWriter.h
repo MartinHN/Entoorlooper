@@ -41,7 +41,7 @@ public:
      * @param width of the frame
      * @param height of the frame
      **/
-    void setup(const char* filename, int width, int height,int targetFPS = 25);
+    int setup(const char* filename, int width, int height,int targetFPS = 25);
 
   void update(float currentTime);
   bool needNewFrame();

@@ -79,6 +79,7 @@
 		22AA5A54DF2DAB865634156A /* FFGLLib.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = FFGLLib.h; path = ../../../addons/ofxFFGLPlugin/libs/FFGL/FFGLLib.h; sourceTree = SOURCE_ROOT; };
 		30F7E723330561EA37D78429 /* FFGLExtensions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = FFGLExtensions.h; path = ../../../addons/ofxFFGLPlugin/libs/FFGL/FFGLExtensions.h; sourceTree = SOURCE_ROOT; };
 		311C323BEFA5B1F457640D41 /* FFGL.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = FFGL.h; path = ../../../addons/ofxFFGLPlugin/libs/FFGL/FFGL.h; sourceTree = SOURCE_ROOT; };
+		3F33F81F1E57631700B056CC /* EntoorlooperDebug.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EntoorlooperDebug.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F691D7A1DCB8A61009E161E /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3F691D8D1DCB8A61009E161E /* install.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = install.xml; sourceTree = "<group>"; };
 		3F691D911DCB8A61009E161E /* HapSupport.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = HapSupport.c; sourceTree = "<group>"; };
@@ -123,7 +124,6 @@
 		E45BE9770E8CC7DD009D7055 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = /System/Library/Frameworks/CoreServices.framework; sourceTree = "<absolute>"; };
 		E45BE9790E8CC7DD009D7055 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		E45BE97A0E8CC7DD009D7055 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
-		E4B69B5B0A3A1756003C02F2 /* EntoorlooperDebug.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EntoorlooperDebug.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1E0A3A1BDC003C02F2 /* pluginApp.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = pluginApp.cpp; path = src/pluginApp.cpp; sourceTree = SOURCE_ROOT; };
 		E4B69E1F0A3A1BDC003C02F2 /* pluginApp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = pluginApp.h; path = src/pluginApp.h; sourceTree = SOURCE_ROOT; };
@@ -352,8 +352,8 @@
 				E4EEC9E9138DF44700A80321 /* openFrameworks */,
 				BB4B014C10F69532006C3DED /* addons */,
 				E45BE5980E8CC70C009D7055 /* frameworks */,
-				E4B69B5B0A3A1756003C02F2 /* EntoorlooperDebug.bundle */,
 				3FFC1F921E492AA600B70AB2 /* Frameworks */,
+				3F33F81F1E57631700B056CC /* EntoorlooperDebug.bundle */,
 			);
 			sourceTree = "<group>";
 		};
@@ -406,7 +406,7 @@
 			);
 			name = EntoorLooper;
 			productName = myOFApp;
-			productReference = E4B69B5B0A3A1756003C02F2 /* EntoorlooperDebug.bundle */;
+			productReference = 3F33F81F1E57631700B056CC /* EntoorlooperDebug.bundle */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -465,7 +465,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -f ../../../libs/fmodex/lib/osx/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/libfmodex.dylib\";\necho \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\ninstall_name_tool -change @executable_path/libfmodex.dylib @loader_path/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\n#mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/data\"\ncp -fR ./bin/data \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/\"\n\nfunction putLib {\n    cp -f \"$1/$2\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$2\";\n    install_name_tool -change \"$3/$2\" \"@loader_path/$2\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\n}\n\n################\n## ffmpeg\nFFMPEGLIBPATH=$FFMPEGPATH/libs-universal\necho $FFMPEGLIBPATH\n$(putLib $FFMPEGLIBPATH libswresample.2.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libswscale.4.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavcodec.57.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavformat.57.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavutil.55.dylib @executable_path)\n$(putLib /usr/local/lib libsnappy.1.dylib @executable_path)\n\n\n\n#mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/Resources/\"\n#cp -f \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/Resources/\"\necho \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\"\ntouch \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\"\n\ncp -rf \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\" \"/Applications/Resolume Arena 5.0.1/plugins/vfx\"\ntouch \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents/MacOS\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents/MacOS/data\"";
+			shellScript = "cp -f ../../../libs/fmodex/lib/osx/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/libfmodex.dylib\";\necho \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\ninstall_name_tool -change @executable_path/libfmodex.dylib @loader_path/libfmodex.dylib \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\n#mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/data\"\ncp -fR ./bin/data \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/\"\n\nfunction putLib {\n    cp -f \"$1/$2\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$2\";\n    install_name_tool -change \"$3/$2\" \"@loader_path/$2\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/MacOS/$PRODUCT_NAME\";\n}\n\n################\n## ffmpeg\nFFMPEGLIBPATH=$FFMPEGPATH/libs_32\necho $FFMPEGLIBPATH\n$(putLib $FFMPEGLIBPATH libswresample.2.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libswscale.4.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavcodec.57.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavformat.57.dylib @executable_path)\n$(putLib $FFMPEGLIBPATH libavutil.55.dylib @executable_path)\n$(putLib /usr/local/lib libsnappy.1.dylib @executable_path)\n\n\n\n#mkdir -p \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/Resources/\"\n#cp -f \"$ICON_FILE\" \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle/Contents/Resources/\"\necho \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\"\ntouch \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\"\n\ncp -rf \"$TARGET_BUILD_DIR/$PRODUCT_NAME.bundle\" \"/Applications/Resolume Arena 5.0.1/plugins/vfx\"\ntouch \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents/MacOS\"\nchmod a+wx \"/Applications/Resolume Arena 5.0.1/plugins/vfx/$PRODUCT_NAME.bundle/Contents/MacOS/data\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -539,7 +539,7 @@
 					"-mtune=native",
 				);
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				TARGET_OS_MAC = 1;
 			};
 			name = Debug;
@@ -578,7 +578,7 @@
 					"-mtune=native",
 				);
 				PRESERVE_DEAD_CODE_INITS_AND_TERMS = YES;
-				SDKROOT = macosx;
+				SDKROOT = macosx10.11;
 				TARGET_OS_MAC = 1;
 			};
 			name = Release;
@@ -673,12 +673,13 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_52)",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					/usr/local/lib/libsndfile.a,
-					"-L/Users/Tintamar/Downloads/FFmpeg-master/libs-universal",
+					"-L$(FFMPEGPATH)/libs_32",
+					"-lavutil",
 					"-lavformat",
 					"-lavcodec",
 					"-lswresample",
@@ -780,12 +781,13 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
 				MACH_O_TYPE = mh_bundle;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(OF_CORE_LIBS)",
 					/usr/local/lib/libsndfile.a,
-					"-L/Users/Tintamar/Downloads/FFmpeg-master/libs-universal",
+					"-L$(FFMPEGPATH)/libs_32",
+					"-lavutil",
 					"-lavformat",
 					"-lavcodec",
 					"-lswresample",

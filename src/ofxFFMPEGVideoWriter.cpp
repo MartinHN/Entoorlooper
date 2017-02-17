@@ -22,7 +22,11 @@ extern "C" {
 
 #include "ofxFFMPEGVideoWriter.h"
 
-void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int _targetFPS) {
+int ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int _targetFPS) {
+  if(initialized){
+    close();
+  }
+
   targetFPS = _targetFPS;
   printf("Video encoding: %s\n",filename);
   /* register all the formats and codecs */
@@ -54,7 +58,7 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
   }
   if (!oc) {
     fprintf(stderr, "could not create AVFormat context\n");
-    exit(1);
+    return 1;
   }
   fmt = oc->oformat;
   if(codec){
@@ -72,7 +76,7 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
 
     if (!codec) {
       fprintf(stderr, "codec not found: %s\n", avcodec_get_name(avcid));
-      exit(1);
+      return 1;
     } else {
       const AVPixelFormat* p = codec->pix_fmts;
       while (*p != AV_PIX_FMT_NONE) {
@@ -85,7 +89,7 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
     video_st = avformat_new_stream(oc, codec);
     if (!video_st) {
       fprintf(stderr, "Could not allocate stream\n");
-      exit(1);
+      return 1;
     }
     video_st->id = oc->nb_streams-1;
     c = video_st->codec;
@@ -131,7 +135,7 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
     }
     if (avcodec_open2(c, codec, &options) < 0) {
       fprintf(stderr, "could not open codec\n");
-      exit(1);
+      return 1;
     }
     else {
       printf("opened %s\n", avcodec_get_name(codec->id));
@@ -150,7 +154,7 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
 
     if((ret = av_image_alloc(picture_rgba->data, picture_rgba->linesize, c->width, c->height, (AVPixelFormat)picture_rgba->format, 24)) < 0) {
       fprintf(stderr,"cannot allocate RGB temp image\n");
-      exit(1);
+      return 1;
     } else
       printf("allocated picture of size %d (ptr %s), linesize %d %d %d %d\n",ret,picture_rgba->data[0],picture_rgba->linesize[0],picture_rgba->linesize[1],picture_rgba->linesize[2],picture_rgba->linesize[3]);
 
@@ -164,14 +168,14 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
     int ret;
     if ((ret = avio_open(&oc->pb, filename, AVIO_FLAG_WRITE)) < 0) {
       fprintf(stderr, "Could not open '%s': %s\n", filename, av_err2str(ret));
-      exit(1);
+      return 1;
     }
   }
   /* Write the stream header, if any. */
   int ret = avformat_write_header(oc, NULL);
   if (ret < 0) {
     fprintf(stderr, "Error occurred when opening output file: %s\n", av_err2str(ret));
-    exit(1);
+    return 1;
   }
 
 
@@ -180,6 +184,8 @@ void ofxFFMPEGVideoWriter::setup(const char* filename, int width, int height,int
   frame_count = 0;
   currentTime = 0;
   lastTimeFrameAdded - 100;
+
+  return 0;
 }
 
 int ofxFFMPEGVideoWriter::getWidth(){
@@ -223,7 +229,7 @@ void ofxFFMPEGVideoWriter::addFrame( uint8_t* pixels) {
   int ret = avcodec_encode_video2(c, &pkt, picture_rgba, &got_packet);
   if (ret < 0) {
     fprintf(stderr, "Error encoding video frame: %s\n", av_err2str(ret));
-    exit(1);
+    return 1;
   }
   /* If size is zero, it means the image was buffered. */
   if (!ret && got_packet && pkt.size) {
@@ -246,6 +252,7 @@ void ofxFFMPEGVideoWriter::addFrame( uint8_t* pixels) {
   }
 
   lastTimeFrameAdded = currentTime;
+
 }
 
 
